@@ -17134,13 +17134,13 @@ VALUES
   
   select * from weekly_sales;
   select count(*) from weekly_sales;
--- Update the 'string_date_column' to the proper date format
+                               -- Update the 'string_date_column' to the proper date format
 alter table weekly_sales
 modify column week_date varchar(20);
 UPDATE weekly_sales
 SET week_date = STR_TO_DATE(week_date, '%d/%m/%Y');
 commit;
--- we have to create another clean table -----------------------
+                               -- we have to create another clean table -----------------------
 create table clean_weekly_sales as
 select week_date,
 week(week_date) as week_number,
@@ -17169,20 +17169,20 @@ from weekly_sales;
 select * from clean_weekly_sales;
 
 --                                   B. Data Exploration ---------------
--- 1. What day of the week is used for each week_date value?
+                    -- 1. What day of the week is used for each week_date value?
 select week_date,dayofweek(week_date) from clean_weekly_sales;
 
--- 2. How many total transactions were there for each year in the dataset? ----------
+                      -- 2. How many total transactions were there for each year in the dataset? ----------
 select sum(transactions) as total_transaction,calender_year from  clean_weekly_sales
 group by calender_year;
 
--- 3. What is the total sales for each region for each month? --------
+                              -- 3. What is the total sales for each region for each month? --------
 select sum(sales) as total_sales,region,month_number from clean_weekly_sales group by month_number, region;
 
--- 4. What is the total count of transactions for each platform? ---------
+                            -- 4. What is the total count of transactions for each platform? ---------
 select count(transactions) ,platform from clean_weekly_sales group by platform;
 
--- 5. What is the percentage of sales for Retail vs Shopify for each month? ------
+                       -- 5. What is the percentage of sales for Retail vs Shopify for each month? ------
 with cte_monthly_platform_sales as
 (select month_number,calender_year,platform,
 sum(sales) as monthly_sales from clean_weekly_sales
@@ -17196,13 +17196,13 @@ as shopify_percentage
 from cte_monthly_platform_sales
 group by month_number,calender_year;
 
--- 6. What is the percentage of sales by demographic for each year in the dataset?
+                  -- 6. What is the percentage of sales by demographic for each year in the dataset?
 select calender_year,demographic,sum(sales) as yearly_sales,
 round(100*sum(sales)/sum(sum(sales)) over (partition by demographic),2) as percentage
 from clean_weekly_sales
 group by calender_year,demographic;
 
--- 8. Which age_band and demographic values contribute the most to Retail sales?
+                 -- 8. Which age_band and demographic values contribute the most to Retail sales?
 select age_band,demographic,sum(sales) as total_sales from clean_weekly_sales
 where platform= 'Retail'
 group by age_band,demographic
